@@ -22,6 +22,7 @@ app.use(express.static("public"));
 app.get("/", function (req, rsp) {
     rsp.render("home", {
         homeContent: homeStartingContent,
+        blogPosts: blogPost
     });
 });
 
@@ -47,7 +48,6 @@ app.post("/compose", function (req, rsp) {
         body: req.body.post
     }
     blogPost.push(newPost);
-    console.log(blogPost);
     rsp.redirect("/");
 });
 
