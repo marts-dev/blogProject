@@ -24,6 +24,18 @@ app.get("/", function (req, rsp) {
   });
 });
 
+app.get("/about", function (req, rsp) {
+  rsp.render("about", {
+    aboutContent: aboutContent,
+  });
+});
+
+app.get("/contact", function (req, rsp) {
+  rsp.render("contact", {
+    contactContent: contactContent,
+  });
+});
+
 app.listen(3000, function () {
   console.log("Server started on port 3000");
 });
