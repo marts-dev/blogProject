@@ -40,6 +40,11 @@ app.get("/compose", function (req, rsp) {
     rsp.render("compose");
 });
 
+app.post("/compose", function (req, rsp) {
+    console.log(req.body.userContent);
+    rsp.send("OK")
+});
+
 app.listen(3000, function () {
     console.log("Server started on port 3000");
 });
