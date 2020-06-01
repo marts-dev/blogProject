@@ -48,10 +48,10 @@ app.get("/posts/:topic", function (req, rsp) {
     blogPost.forEach((post) => {
         const storedTopic = _.kebabCase(post.title);
         if (storedTopic === queryTopic) {
-            console.log(queryTopic);
-            console.log("Found");
-        } else {
-            console.log("Not found");
+            rsp.render("post", {
+                title: post.title,
+                content: post.body,
+            });
         }
     });
 });
