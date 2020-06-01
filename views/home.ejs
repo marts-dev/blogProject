@@ -3,6 +3,8 @@
 <p><%= homeContent%></p>
 <% for (const item of blogPosts) { %>
 <h1><%= item.title%></h1>
-<p><%= item.body.substring(0, 100) + "..."%></p>
+<p><%= item.body.substring(0, 100) + "..."%>
+    <a href="posts/<%= item.title%>">Read more</a>
+</p>
 <% } %>
 <%- include('partials/footer') -%>
