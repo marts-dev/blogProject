@@ -42,6 +42,18 @@ app.get("/compose", function (req, rsp) {
     rsp.render("compose");
 });
 
+app.get("/posts/:topic", function (req, rsp) {
+    const queryTopic = req.params.topic;
+    blogPost.forEach((post) => {
+        const storedTopic = post.title;
+        if (storedTopic === queryTopic) {
+            console.log("Found");
+        } else {
+            console.log("Not found");
+        }
+    });
+});
+
 app.post("/compose", function (req, rsp) {
     const newPost = {
         title: req.body.title,
