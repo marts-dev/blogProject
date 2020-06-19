@@ -2,8 +2,11 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
-const ejs = require("ejs");
+const mongoose = require("mongoose");
 const _ = require("lodash");
+const dotenv = require("dotenv");
+dotenv.config();
+const uri = process.env.MONGO_LOCAL;
 
 const homeStartingContent =
     "Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.";
@@ -20,10 +23,36 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+//Establish DB Connection
+mongoose.connect(
+    uri,
+    {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+    }
+);
+//Create schema
+const blogSchema = mongoose.Schema({
+    title: {
+        type: String,
+        required: [true, "Title must be specified"],
+    },
+    body: String,
+});
+//Create model/collection
+const Post = mongoose.model("Post", blogSchema);
+
 app.get("/", function (req, rsp) {
-    rsp.render("home", {
-        homeContent: homeStartingContent,
-        blogPosts: blogPost
+    Post.find({}, function (err, postList) {
+        if (err) {
+            console.log("Failed to retrieve nay post");
+        } else {
+            rsp.render("home", {
+                homeContent: homeStartingContent,
+                blogPosts: postList
+            });
+        }
     });
 });
 
@@ -43,28 +72,34 @@ app.get("/compose", function (req, rsp) {
     rsp.render("compose");
 });
 
-app.get("/posts/:topic", function (req, rsp) {
-    const queryTopic = _.kebabCase(req.params.topic);
-    blogPost.forEach((post) => {
-        const storedTopic = _.kebabCase(post.title);
-        if (storedTopic === queryTopic) {
+app.get("/posts/:id", function (req, rsp) {
+    const queryTopic = req.params.id;
+    Post.findById(queryTopic, function (err, post) {
+        if (!err) {
             rsp.render("post", {
                 title: post.title,
                 content: post.body,
             });
+        } else {
+            console.log("Failure to retrieve post")
         }
     });
 });
 
 app.post("/compose", function (req, rsp) {
-    const newPost = {
+    const newPost = new Post({
         title: req.body.title,
         body: req.body.post
-    }
-    blogPost.push(newPost);
-    rsp.redirect("/");
+    });
+    //blogPost.push(newPost);
+    newPost.save(function (err) {
+        if (!err) {
+            rsp.redirect("/");
+        }
+    });
 });
 
-app.listen(3000, function () {
-    console.log("Server started on port 3000");
+app.listen(process.env.PORT || 3000, function () {
+    console.log("Server started");
 });
+
